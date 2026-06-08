@@ -1,0 +1,28 @@
+name: Deploy ChaiCode VM on Ex-cloud
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to Ex-cloud
+      uses: appleboy/ssh-action@v1.03
+      with:
+        host: 210.79.128.211
+        username: ubuntu
+        key: ${{ secrets.PRIVATE_KEY }}
+        script: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          cd /home/ubuntu/devOpsVm
+          git pull origin master
+          npm install
+          pm2 restart 0
