@@ -6,8 +6,7 @@ import path from "path";
 const PORT = process.env.PORT ?? 8000;
 
 app.get("/", (req, res) => {
- 
-  const html = fs.readFileSync(path.join(process.cwd()., "index.html"), "utf-8");
+  const html = fs.readFileSync(path.join(process.cwd(), "index.html"), "utf-8");
   return res.send(html);
 });
 
