@@ -10,19 +10,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Deploy to Ex-cloud
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: 210.79.128.211
-        username: ubuntu
-        key: ${{ secrets.PRIVATE_KEY }}
-        script: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          cd /home/ubuntu/devOpsVm
-          git pull origin master
-          npm install
-          pm2 restart 0
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      -name: docker build and push
+        run: |
+        docker build -t nikhiljha02/chaicodevm .
+        docker push nikhiljha02/chaicodevm
+
+      - name: Deploy to Ex-cloud
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 210.79.128.211
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            cd /home/ubuntu/devOpsVm
+            git pull origin master
+            npm install
+            pm2 restart 0
